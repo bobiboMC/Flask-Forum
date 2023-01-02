@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block h1 %}
+	<span>
+		<form action="{{ url_for('blog.index')}}" method="get" class='inlineForm'>
+		<input name="filter_page" id="filter_page"></input> 
+		<button  value='to_filter' id='to_filter' type="submit">Filter</button>
+		</form>
+		<span id='wrapper'>
+		<ul id="navPages">
+		  {% for i in range(0,amount_posts) %}
+			{% if i%5==0 %}
+				<li class="navPage"><a href="{{ url_for('blog.index',page=((i//5)+1),tag=tag_selected,filter_page=name_selected)}}">{{(i//5)+1}}</a></li>
+			{% endif %}
+		  {% endfor %}
+		</ul>
+		</span>
+	</span>
+{% endblock %}
+
+{% block header %}
+   <span id='tagi'>	
+		  <h1>
+		  {% block title %}
+				Posts
+		  {% endblock %}
+		  </h1>
+		  <h3>
+		  <span style='color:#377ba8;'>| </span>
+		  </h3>
+		  {% for tag in tags %}
+				<h3>
+				<a class='tags' href="{{ url_for('blog.index',tag=tag )}}">{{tag}}</a>
+				</h3>
+		  {% endfor %}
+		  <h3>
+		  <a class='tags' href="{{ url_for('blog.index')}}">All</a>
+		  </h3>
+		  {% if g.user %}
+				<a class="action" href="{{ url_for('blog.create')}}">New</a>
+		  {% endif %}
+   </span>
+{% endblock %}
+
+{% block content %}
+  {% for post in posts %}
+    <article class="post">
+      <header>
+        <div>
+          <a class='showing' href="{{ url_for('blog.show_post',id=post['id'],author=post['username'])}}">{{ post['title'] }}</a>
+          <div class="about">by {{ post['username'] }} on {{ post['created'] }}
+			<span style='color:#377ba8;'>| </span>
+			<span class='postTag'>{{post['tag']}}</span>
+		  </div>
+        </div>
+        {% if g.user['id'] == post['author_id'] %}
+          <a class="action" id='EditPost' href="{{ url_for('blog.update', id=post['id']) }}">Edit</a>
+        {% endif %}
+      </header>
+    </article>
+    {% if not loop.last %}
+      <hr>
+    {% endif %}
+  {% endfor %}
+  
+  
+  
+  <script src="https://code.jquery.com/jquery-3.5.1.js"
+          integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+          crossorigin="anonymous"></script>
+  <script>
+	$(function() {
+	  $('.tags').hover(function() {
+		let textHovered = this.textContent;
+		let postTagsClass=document.getElementsByClassName('postTag');
+		//alert(postTagsClass[0]);
+		for (let i = 0; i < postTagsClass.length; i++) {
+			//alert(postTagsClass[i].textContent);
+			if(postTagsClass[i].textContent==textHovered){
+				//alert(postTagsClass[i].textContent+','+textHovered);
+				$(postTagsClass[i]).css('background-color', 'yellow');
+			}
+		} 
+	  }, function() {
+		// on mouseout, reset the background colour
+		$('.postTag').css('background-color', '');
+	  });
+	});
+  </script>
+{% endblock %}
