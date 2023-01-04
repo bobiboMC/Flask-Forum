@@ -105,21 +105,24 @@ input[type=submit] { align-self: start; min-width: 10em; }
 .navPage{
 	font-size:1rem;
 	display:inline;
+	border-left: 0.1em solid black;
+
 }
 
+.navPage:first-child {
+    border: none;
+}
 #navPages{
 	margin: 0;
 	padding: 0;
-	border: 0.05em solid black;
-	margin-left:-1%;
-	margin-right:2%;
+	border: 0.2em solid black;
+	background: linear-gradient(to bottom right, #DFDD3B  0%, #B2AF13  100%);
 }
 
 #navPages a{
 	  display: block;
 	  text-align: center;
-	  text-decoration: none;
-	  border: 0.05em solid black;
+	  text-decoration: none
 }
 
 #wrapper{
@@ -128,5 +131,19 @@ input[type=submit] { align-self: start; min-width: 10em; }
 }
 
 
+.postImg{
+	border:0.08em solid black;
+}
+
+#backImg{
+	background: linear-gradient(to bottom right,#000000,#A55C1B);
+	display:flex;	
+	width:10em;
+	height:10em;
+	align-items: center;
+	justify-content: center;
+	overflow:hidden;
+	
+}
 
 

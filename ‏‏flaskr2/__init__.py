@@ -14,6 +14,7 @@ def create_app(test_config=None):
     app.config.from_mapping(
         SECRET_KEY='dev',
         DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
+        UPLOAD_FOLDER=r'C:\Users\Boris\flask_myself_0\venv\Lib\site-packages\flaskr\static'
     )
 
     if test_config is None:
@@ -43,7 +44,10 @@ def create_app(test_config=None):
 
     from . import blog
     app.register_blueprint(blog.bp)
-    app.add_url_rule('/', endpoint='index')
+    app.add_url_rule("/", endpoint='index')
+    #app.add_url_rule("/", endpoint='blog.index')
+    #app.add_url_rule("/", defaults={"page": 1}, endpoint="blog.index")#test
+    #app.add_url_rule("/<int:page>", endpoint="blog.index")#test
     
     class RegexConverter(BaseConverter):
         def __init__(self, url_map, *items):

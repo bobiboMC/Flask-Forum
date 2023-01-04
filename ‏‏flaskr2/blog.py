@@ -1,8 +1,9 @@
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, url_for
+    Blueprint, flash, g, redirect, render_template, request, url_for,current_app,get_flashed_messages,session
 )
 from werkzeug.exceptions import abort
-
+from werkzeug.utils import secure_filename
+import os
 from flaskr.auth import login_required
 from flaskr.db import get_db
 
@@ -12,11 +13,11 @@ from datetime import timedelta
 from flaskr import time_zones #later for add country register
 
 
-
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 bp = Blueprint('blog', __name__)
 
-#@bp.route('/',defaults={'page': '1'}) # for normal state:@bp.route('/')
-@bp.route('/<int:page>',defaults={'page': '1'})
+#@bp.route('/')
+@bp.route('/',defaults={"page": 1})
 @bp.route('/<int:page>')
 def index(page):
     print(page,'id')
@@ -47,7 +48,9 @@ def index(page):
     amount_posts=len(posts)
     #display 5 post per page
     posts=display_per_page(posts,page,5)  
-    
+    #print('that')
+    #print('that')
+    #print('that',amount_posts)
     return render_template('blog/index.html', posts=posts,tags=tags,
                             amount_posts=amount_posts,tag_selected=args.get("tag"),name_selected=args.get("filter_page"))
 
@@ -55,26 +58,29 @@ def index(page):
 @login_required
 def create():
     tags=['football','rap','movies']
+    print('??')
     if request.method == 'POST':
         title = request.form['title']
         body = request.form['body']
         tag = request.form['tag']
+        #print(title,body,tag)
         error = None
+        thumbnail=upload_file()
 
         if not title:
             error = 'Title is required.'
         
         elif tag not in tags:
             error = 'illegal tag.'
-
+        
         if error is not None:
             flash(error)
-        else:
+        elif thumbnail:
             db = get_db()
             db.execute(
-                'INSERT INTO post (title, body, author_id, tag)'
-                ' VALUES (?, ?, ?, ?)',
-                (title, body, g.user['id'], tag)
+                'INSERT INTO post (title, body, author_id, tag,thumbnail)'
+                ' VALUES (?, ?, ?, ?, ?)',
+                (title, body, g.user['id'], tag,thumbnail)
             )
             db.commit()
             return redirect(url_for('blog.index'))
@@ -102,25 +108,28 @@ def get_post(id, check_author=True):
 @bp.route('/<int:id>/update', methods=('GET', 'POST'))
 @login_required
 def update(id):
+    tags=['football','rap','movies']
     post = get_post(id)
-
     if request.method == 'POST':
         title = request.form['title']
         body = request.form['body']
         tag = request.form['tag']
         error = None
+        thumbnail=upload_file()
 
         if not title:
             error = 'Title is required.'
-
+        elif tag not in tags:
+            error = 'illegal tag.'
+            
         if error is not None:
             flash(error)
-        else:
+        elif thumbnail:
             db = get_db()
             db.execute(
-                'UPDATE post SET title = ?, body = ?,tag = ?'
+                'UPDATE post SET title = ?, body = ?,tag = ?,thumbnail = ?'
                 ' WHERE id = ?',
-                (title, body, tag, id)
+                (title, body, tag,thumbnail,id)
             )
             db.commit()
             return redirect(url_for('blog.index'))
@@ -137,24 +146,15 @@ def delete(id):
     db.commit()
     return redirect(url_for('blog.index'))
 
+#delete all my posts of user 'id'
+@bp.route('/<int:author_id>//delete_all', methods=('GET',))
+@login_required
+def delete_all(author_id):
+    db = get_db()
+    db.execute('DELETE FROM post WHERE author_id = ?', (author_id,))
+    db.commit()
+    return redirect(url_for('blog.index'))
 
-
-#@bp.route('/filter', methods=['GET'])
-#@login_required
-#def filter_posts():
-    #args = request.args 
-    #print(args.get("filter_page"),'filter_page')#for get request
-    #filter_by=args.get("filter_page")
-    #posts=get_all_posts()
-    #filtered_posts=[]
-    #for post in posts:
-        #print(post['title'].startswith(filter_by),post['title'])
-        #if post['title'].startswith(filter_by):
-            #filtered_posts.append(post['title'])
-            #print('yes')
-    
-    #print(filtered_posts)
-    #return redirect(url_for('blog.index',filtered_posts=filtered_posts))
     
     
 @bp.route('/delete_comment/<int:id>', methods=('POST',))
@@ -192,17 +192,6 @@ def update_comment(id):
         #return render_template('blog/show.html', id=comment['post_id'])
     return render_template('blog/edit_comment.html', comment=comment)
 
-
-
-#@bp.route('/tag/<name_tag>', methods=('GET', 'POST'))
-#@login_required
-#def tag_post(name_tag,posts):
-   #filter_posts_by_tag=[]
-   #for post in posts:
-        #if name_tag==post['tag']:
-            #filter_posts_by_tag.append(post['id'])
-
-    #return redirect(url_for('blog.index'),posts=filter_posts_by_tag)
 
 
     
@@ -359,16 +348,18 @@ def get_name_publisher(publisher_id):
 def get_all_posts():
     db = get_db()
     posts = db.execute(
-        'SELECT p.id, title, body, created, author_id, username,tag'
+        'SELECT p.id, title, body, created, author_id, username,tag,thumbnail'
         ' FROM post p JOIN user u ON p.author_id = u.id'
         ' ORDER BY created DESC'
     ).fetchall()
     return posts
+    
 
 def display_per_page(posts,page,per_page):
     i=0
     posts_per_page=[]
     for post in posts:
+        #print(post.keys())
         if i//per_page==(page-1):
             posts_per_page.append(post)
         i+=1
@@ -376,4 +367,29 @@ def display_per_page(posts,page,per_page):
 #change to local zone timestamp
 #https://stackoverflow.com/questions/14814433/how-to-change-timestamp-of-sqlite-db-to-local-timestamp 
 
+
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def upload_file():
+        #print('ball')
+        # check if the post request has the file part
+        thumbnail=None
+        if 'file' not in request.files:
+            flash('file not in request.files')
+            #print('hdfhdh')
+        file = request.files['file']
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            path_picture=os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+            thumbnail=filename
+            file.save(path_picture)
+        elif not(allowed_file(file.filename)):
+            flash('not allowed file')
+            
+        return thumbnail
 

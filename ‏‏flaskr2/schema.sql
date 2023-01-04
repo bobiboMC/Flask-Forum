@@ -18,6 +18,7 @@ CREATE TABLE post (
   tag TEXT,
   likes INTEGER DEFAULT 0,
   dislikes INTEGER DEFAULT 0,
+  thumbnail TEXT NOT NULL,
   FOREIGN KEY (author_id) REFERENCES user (id)
 );
 

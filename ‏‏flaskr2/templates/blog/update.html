@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block content %}
-  <form method="post">
+  <form method="post" enctype="multipart/form-data">
     <label for="title">Title</label>
     <input name="title" id="title"
       value="{{ request.form['title'] or post['title'] }}" required>
@@ -14,6 +14,7 @@
 	<label for="tag">Tag</label>
 	<input name="tag" id="EnterTag"
       value="{{ request.form['tag'] or post['tag'] }}" required>
+	<input type="file" name="file">   
     <input type="submit" value="Save">
   </form>
   <hr>
