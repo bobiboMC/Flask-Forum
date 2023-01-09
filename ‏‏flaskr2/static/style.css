@@ -1,10 +1,11 @@
 html { font-family: sans-serif; background: #eee; padding: 1rem; }
 body { max-width: 960px; margin: 0 auto; background: white; }
-h1 { font-family: serif; color: #377ba8; margin: 1rem 0; }
+h1 { font-family: serif;color: #377ba8; margin: 1rem 0; }
 #tagi{flex: auto; margin: 0.5rem 0 1rem 0; }
 #tagi h1{display:inline-block;}
 #tagi .action{float:right;margin: 0.5rem 0 0.5rem 0;padding: 1rem 0.5rem 0rem 1rem;}
 h3 {display:inline-block;margin: 1rem 0 0.25rem 0;}
+
 
 
 .postTag{color:#377ba8;font-style: normal;}
@@ -34,7 +35,7 @@ nav ul li a, nav ul li span, header .action { display: block; padding: 0.5rem; }
 .content textarea { min-height: 12em; resize: vertical; }
 input.danger { color: #cc2f2e; }
 input[type=submit] { align-self: start; min-width: 10em; }
-.spacing{ margin:2em; }
+.spacing{ margin:2em;}
 .showing{ text-decoration:none; font-size: 2em;display:inline-block;margin:1% 0 0 0;}
 .body{white-space: pre-line;}
 .post{margin-top:1%;}
@@ -147,3 +148,10 @@ input[type=submit] { align-self: start; min-width: 10em; }
 }
 
 
+#myTextPost {margin:1em 0 1em 0;}
+section div h1 {font-size: 2em;}
+section div h2 {font-family: serif}
+section div h3{font-family: serif}
+section div h4{font-family: serif}
+section div h5 {font-family: serif}
+section div h6{font-family: serif}

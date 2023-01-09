@@ -5,7 +5,9 @@
 {% endblock %}
 
 {% block content %}
-  <p class="body spacing">{{post['body']}}</p>
+  <div id='myTextPost'>
+	{{body|safe}}
+  </div>
   <form action="{{ url_for('blog.show_post',id=post['id'],author=post['username'])}}" method="post" class="opin" id="myForm">
         {% if '('+(post['id']|string())+')' in user['liked_posts'] %}
             <button name="opinion" value='Like' class="opinion" id='Like' type="submit" style='background-image: linear-gradient(144deg,#AF40FF, #5B42F3 50%,#00DDEB)'>Like</button>

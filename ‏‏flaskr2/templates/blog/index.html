@@ -1,5 +1,18 @@
 {% extends 'base.html' %}
 
+{% block details %}
+	<div style='padding:5%;border:solid 0.4em brown;font-style: italic;'>
+	<details>
+		<summary>last updates</summary>
+		<ol>
+			{% for feed in last_feeds %}
+				<li><a href={{feed['url']}}>{{feed['title']}}</a></li>
+		  	{% endfor %}
+		</ol>
+	</details>
+	</div>
+{% endblock %}
+
 {% block h1 %}
 	<span>
 		<form class='inlineForm'>
@@ -71,8 +84,6 @@
     {% endif %}
   {% endfor %}
   
-  
-  
   <script src="https://code.jquery.com/jquery-3.5.1.js"
           integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
           crossorigin="anonymous"></script>
@@ -95,4 +106,14 @@
 	  });
 	});
   </script>
+{% endblock %}
+
+{% block footer %}
+	<footer style='text-align: center;'>
+	  <p>
+	  &copy; Copyright 2022-2023 bobiboMC
+	  </br></br>
+	  <a href='https://github.com/bobiboMC'>My_Github</a>
+	  </p>
+	</footer>
 {% endblock %}

@@ -12,6 +12,14 @@ from datetime import datetime
 from datetime import timedelta
 from flaskr import time_zones #later for add country register
 
+import markdown
+import bleach
+
+from feedgen.feed import FeedGenerator
+from flask import make_response
+
+import pytz
+import feedparser
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 bp = Blueprint('blog', __name__)
@@ -47,12 +55,33 @@ def index(page):
     
     amount_posts=len(posts)
     #display 5 post per page
-    posts=display_per_page(posts,page,5)  
-    #print('that')
-    #print('that')
-    #print('that',amount_posts)
+    posts=display_per_page(posts,page,5) 
+    
+    #TEST UNTIL!!!!
+    last_feeds=[]
+    #cur_reponse=rss() #WORKING 1
+    #print(cur_reponse)
+   # print(cur_reponse.data)
+
+    #NewsFeed = feedparser.parse(cur_reponse.data) #WORKING 1
+    NewsFeed = feedparser.parse('http://127.0.0.1:5000/rss') #TEST!!! WORKING?!!?
+    #NewsFeed = feedparser.parse('') #TEST!!!
+    #entry = NewsFeed.entries[0]
+    #print(NewsFeed.entries)
+    
+    for any_entry in NewsFeed.entries:
+        #print(any_entry.keys())
+        feed={}
+        #print(any_entry.title)
+        #last_feeds.append(any_entry.title)
+        feed['title']=any_entry.title
+        feed['url']=any_entry.link
+        last_feeds.append(feed)
+        
+    #TEST HERE!!!!
+    
     return render_template('blog/index.html', posts=posts,tags=tags,
-                            amount_posts=amount_posts,tag_selected=args.get("tag"),name_selected=args.get("filter_page"))
+                            amount_posts=amount_posts,tag_selected=args.get("tag"),name_selected=args.get("filter_page"),last_feeds=last_feeds)
 
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
@@ -113,6 +142,10 @@ def update(id):
     if request.method == 'POST':
         title = request.form['title']
         body = request.form['body']
+        
+        #body=markdown.markdown_post(body)#TEST!!!!!!
+        
+        print(body,'??')
         tag = request.form['tag']
         error = None
         thumbnail=upload_file()
@@ -134,6 +167,8 @@ def update(id):
             db.commit()
             return redirect(url_for('blog.index'))
     
+    print(post['body'],'?')
+    #body=markdown.reverse_markdown_post(post['body'])
     return render_template('blog/update.html', post=post)
 
 
@@ -222,9 +257,13 @@ def show_post(id):
            print(opi)
            add_comment(id, g.user['id'], opi)
     user_new=get_like_dislike_post()  
-
+    
+    body=markdown.markdown(my_post['body'])
+    #print(body)
+    body=bleach.clean(body)
+    print(body)
     return render_template(
-                            'blog/show.html',post=my_post,user=user_new,
+                            'blog/show.html',post=my_post,body=body,user=user_new,
                             comments_post=comments,comment_publishers=publishers,
                             comment_times=comments_actual_time) #work!!! 3
 
@@ -393,3 +432,70 @@ def upload_file():
             
         return thumbnail
 
+
+
+# ...
+
+#TEST!!!
+@bp.route('/rss')
+def rss():
+    fg = FeedGenerator()
+    fg.title('hello')
+    fg.description('hello to my fellows')
+    fg.link(href='http://127.0.0.1:5000')
+
+    for article in get_last_posts(): # get_last_posts() returns a list of articles from somewhere
+        fe = fg.add_entry()
+        fe.title(article['title'])
+        fe.link(href=article['url'])
+        fe.description(article['content'])
+        #fe.guid(article.id, permalink=False) # Or: fe.guid(article.url, permalink=True)
+        fe.author(name=article['author'])
+        fe.pubDate(article['created_at'])
+
+    response = make_response(fg.rss_str())
+    response.headers.set('Content-Type', 'application/rss+xml')
+    return response
+    
+def get_last_posts():
+    db = get_db()
+    posts = db.execute(
+        'SELECT p.id, title, body, created, author_id, username,tag,thumbnail'
+        ' FROM post p JOIN user u ON p.author_id = u.id'
+        ' ORDER BY created DESC'
+        ' LIMIT 3'
+    )
+    all_rss=[]
+    for post in posts:
+        print(post['title'])
+        fg=rss_post(post)
+        all_rss.append(fg)
+    return all_rss
+    
+
+def rss_post(post):
+    fg={}
+    fg['title']=post['title']
+    fg['url']='http://127.0.0.1:5000/post/'+str(post['id'])
+    fg['content']=post['body']
+    #fg.guid(post['id'], permalink=False) # Or: fe.guid(article.url, permalink=True)
+    fg['author']=post['username']
+    #print(pytz.utc.localize(post['created']))
+    fg['created_at']=pytz.utc.localize(post['created'])
+    #print(fg)
+    return fg
+    
+#https://stackoverflow.com/questions/7372918/whats-the-use-of-r-escape-sequence
+#https://stackoverflow.com/questions/22898559/why-is-h2-larger-than-h1
+
+
+
+"""# hi
+## nice to meet you
+*I forgot my name!*  
+*my name is not to become what I* ***became***
+> *I'm comming!*  
+>> *fack 2005*
+<script>alert('hi')</script>
+[https://github.com/Python-Markdown/markdown/issues/976]( javascript:alert(1) ) 
+since when you forgot your name?"""
