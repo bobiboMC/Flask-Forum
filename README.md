@@ -54,9 +54,11 @@ Install ```pytz``` library:
 
 On cmd,simply run these commands:
 
+Initialize the database:
+
 ```flask --app my_project init-db```
 
-Then run this:
+run the program:
 
 ```flask --app my_project --debug```
 
