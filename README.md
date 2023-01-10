@@ -58,7 +58,7 @@ Initialize the database:
 
 ```flask --app my_project init-db```
 
-run the program:
+Run the program:
 
 ```flask --app my_project --debug```
 
