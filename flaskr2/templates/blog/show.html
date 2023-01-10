@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}{{post['title']}}{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  <div id='myTextPost'>
+	{{body|safe}}
+  </div>
+  <form action="{{ url_for('blog.show_post',id=post['id'],author=post['username'])}}" method="post" class="opin" id="myForm">
+        {% if '('+(post['id']|string())+')' in user['liked_posts'] %}
+            <button name="opinion" value='Like' class="opinion" id='Like' type="submit" style='background-image: linear-gradient(144deg,#AF40FF, #5B42F3 50%,#00DDEB)'>Like</button>
+		{% else %}
+            <button name="opinion" value='Like' class="opinion" id='Like' type="submit" style='background-color:gray'>Like</button>	
+        {% endif %} 
+  </form>	
+        <span class='count' id='textLike'>{{post['likes']}}</span>
+  <form action="{{ url_for('blog.show_post',id=post['id'],author=post['username'])}}" method="post" class="opin" id="myForm">	
+		{% if '('+(post['id']|string())+')' in user['disliked_posts'] %}
+		    <button name="opinion" value='Dislike' class="opinion" id='Dislike' type="submit" style='background-image: linear-gradient(135deg, #f34079 40%, #fc894d)'>Dislike</button>
+		{% else %}
+			<button name="opinion" value='Dislike' class="opinion" id='Dislike' type="submit" style='background-color:gray'>Dislike</button>
+        {% endif %} 
+  </form>		
+        <span class='count' id='textDislike'>{{post['dislikes']}}</span>
+		<div class='comment'>
+			<textarea name="comment" id="commentArea"></textarea> 
+			<button name="comment" value='Comment' id='toComment' type="submit" style='background-image: linear-gradient(#37ADB2, #329CA0)'>publish</button>
+		</div>
+		<div id='containerComment'>
+			{% for comment in comments_post %}
+				<div class='show_comment'>
+					<p>{{ comment['body'].replace("%3F","?") }}</p>
+					<p class="about">by {{ comment_publishers[loop.index0] }} on {{ comment_times[loop.index0]}}</p>
+				</div>
+				{% if comment_publishers[loop.index0]==g.user['username'] %}
+					<form action="{{ url_for('blog.update_comment', id=comment['id'])}}" method="get" id='Edit'>
+						<button name="userAction" value='editComment' id='toEdit' class='bo' type="submit" style='background-image: linear-gradient(#37ADB2, #329CA0)'>Edit</button>
+					</form>
+				{% endif %}
+			{% endfor %}
+		</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.js"
+          integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+          crossorigin="anonymous"></script>
+
+<script>
+	const id = '{{post["id"]}}';
+	const username = "{{ g.user['username']}}";
+</script>		  
+<script type="text/javascript"
+         src="{{ url_for('static', filename='real_time_show.js') }}"></script> 
+
+{% endblock %}
+
+
