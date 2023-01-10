@@ -21,7 +21,7 @@ Forum created in flask
 
 ## Pre-requestment
 ### Virtual enviroment
-1. Make new directory, for example: 'path/to/my_project'
+1. Make a new directory, for example: 'path/to/my_project'
 2. Make a virtual enviroment and activate it
 
 ### Installing Libraries
