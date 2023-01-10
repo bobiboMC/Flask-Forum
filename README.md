@@ -53,6 +53,7 @@ Install ```pytz``` library:
 ## How to run the program:
 
 On cmd,simply run these commands:
+
 ```flask --app flaskr init-db```
 
 Then run this:
