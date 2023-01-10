@@ -53,6 +53,7 @@ Install ```pytz``` library:
 ## How to run the program:
 
 If you work on cmd,simply run this commad:
+
 ```flask --app my_project --debug```
 
 
