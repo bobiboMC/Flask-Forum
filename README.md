@@ -19,7 +19,7 @@ Forum create in flask
 14. filter posts by tag
 15. RSS feed for new posts
 
-##Pre-requestment
+## Pre-requestment
 ### Virtual enviroment
 1. Make new directory, for example: 'path/to/my_project'
 2. Make a virtual enviroment and activate it
