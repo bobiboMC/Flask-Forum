@@ -54,7 +54,7 @@ Install ```pytz``` library:
 
 On cmd,simply run these commands:
 
-```flask --app flaskr init-db```
+```flask --app my_project init-db```
 
 Then run this:
 
