@@ -15,8 +15,8 @@ Forum created in flask
 10. Navigation pages
 11. Option to choose how many posts per page
 12. Marking tag when hover on that tag
-13. filter posts by name
-14. filter posts by tag
+13. Filter posts by name
+14. Filter posts by tag
 15. RSS feed for new posts
 
 ## Pre-requestment
