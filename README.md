@@ -1,5 +1,5 @@
 # Flask-Forum
-Forum create in flask
+Forum created in flask
 
 ## Features
 
