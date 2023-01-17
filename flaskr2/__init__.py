@@ -14,7 +14,7 @@ def create_app(test_config=None):
     app.config.from_mapping(
         SECRET_KEY='dev',
         DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
-        UPLOAD_FOLDER=r'C:\Users\Boris\flask_myself_0\venv\Lib\site-packages\flaskr\static'
+        UPLOAD_FOLDER=r'YOUR UPLOAD PATH FOLDER'
     )
 
     if test_config is None:
@@ -30,24 +30,16 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    # a simple page that says hello
-    @app.route('/hello')
-    def hello():
-        return 'Hello, World!'
-    
 
-    from flaskr import db
+    from oauth2 import db
     db.init_app(app)
 
-    from flaskr import auth
+    from oauth2 import auth
     app.register_blueprint(auth.bp)
 
-    from . import blog
+    from oauth2 import blog
     app.register_blueprint(blog.bp)
     app.add_url_rule("/", endpoint='index')
-    #app.add_url_rule("/", endpoint='blog.index')
-    #app.add_url_rule("/", defaults={"page": 1}, endpoint="blog.index")#test
-    #app.add_url_rule("/<int:page>", endpoint="blog.index")#test
     
     class RegexConverter(BaseConverter):
         def __init__(self, url_map, *items):
@@ -55,14 +47,6 @@ def create_app(test_config=None):
            self.regex = items[0]
     app.url_map.converters['regex'] = RegexConverter
 
-    #@app.route('/<regex("[abcABC0-9]{4,6}"):uid>-<slug>/')
-    #def example(uid, slug):
-        #return "uid: %s, slug: %s" % (uid, slug) #work exmaple stackoverflow guy
-
-    #@app.route('/<regex("[abcABC0-9]{4,6}"):wrong_url>')
-    #def example(wrong_url):
-        #abort(401)
-        #return f"<h1>{escape(wrong_url)}</h1>" #work my way
         
     @app.errorhandler(404)
     def page_not_found(error):

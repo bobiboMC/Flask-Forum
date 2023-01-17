@@ -4,22 +4,12 @@ from flask import (
 from werkzeug.exceptions import abort
 from werkzeug.utils import secure_filename
 import os
-from flaskr.auth import login_required
-from flaskr.db import get_db
+from oauth2.auth import login_required
+from oauth2.db import get_db
 
 #import json
 from datetime import datetime
 from datetime import timedelta
-from flaskr import time_zones #later for add country register
-
-import markdown
-import bleach
-
-from feedgen.feed import FeedGenerator
-from flask import make_response
-
-import pytz
-import feedparser
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 bp = Blueprint('blog', __name__)
@@ -57,31 +47,10 @@ def index(page):
     #display 5 post per page
     posts=display_per_page(posts,page,5) 
     
-    #TEST UNTIL!!!!
-    last_feeds=[]
-    #cur_reponse=rss() #WORKING 1
-    #print(cur_reponse)
-   # print(cur_reponse.data)
 
-    #NewsFeed = feedparser.parse(cur_reponse.data) #WORKING 1
-    NewsFeed = feedparser.parse('http://127.0.0.1:5000/rss') #TEST!!! WORKING?!!?
-    #NewsFeed = feedparser.parse('') #TEST!!!
-    #entry = NewsFeed.entries[0]
-    #print(NewsFeed.entries)
-    
-    for any_entry in NewsFeed.entries:
-        #print(any_entry.keys())
-        feed={}
-        #print(any_entry.title)
-        #last_feeds.append(any_entry.title)
-        feed['title']=any_entry.title
-        feed['url']=any_entry.link
-        last_feeds.append(feed)
-        
-    #TEST HERE!!!!
     
     return render_template('blog/index.html', posts=posts,tags=tags,
-                            amount_posts=amount_posts,tag_selected=args.get("tag"),name_selected=args.get("filter_page"),last_feeds=last_feeds)
+                            amount_posts=amount_posts,tag_selected=args.get("tag"),name_selected=args.get("filter_page"),last_feeds=['No updates'])
 
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
@@ -485,17 +454,4 @@ def rss_post(post):
     #print(fg)
     return fg
     
-#https://stackoverflow.com/questions/7372918/whats-the-use-of-r-escape-sequence
-#https://stackoverflow.com/questions/22898559/why-is-h2-larger-than-h1
 
-
-
-"""# hi
-## nice to meet you
-*I forgot my name!*  
-*my name is not to become what I* ***became***
-> *I'm comming!*  
->> *fack 2005*
-<script>alert('hi')</script>
-[https://github.com/Python-Markdown/markdown/issues/976]( javascript:alert(1) ) 
-since when you forgot your name?"""

@@ -11,5 +11,6 @@
     <label for="password">Password</label>
     <input type="password" name="password" id="password" required>
     <input type="submit" value="Log In">
+	<a href="{{ url_for('auth.forget_pwd_outlook')}}">Forget your password?</a>
   </form>
 {% endblock %}

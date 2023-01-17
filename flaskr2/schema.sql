@@ -1,10 +1,12 @@
 DROP TABLE IF EXISTS user;
 DROP TABLE IF EXISTS post;
+DROP TABLE IF EXISTS comment;
 
 CREATE TABLE user (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   username TEXT UNIQUE NOT NULL,
   password TEXT NOT NULL,
+  email TEXT UNIQUE NOT NULL,
   liked_posts DEFAULT "(-1)",
   disliked_posts DEFAULT "(-1)" 
 );

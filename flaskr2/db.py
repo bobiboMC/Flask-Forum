@@ -3,6 +3,8 @@ import sqlite3
 import click
 from flask import current_app, g
 
+import getpass #added
+from werkzeug.security import check_password_hash, generate_password_hash #added
 
 def get_db():
     if 'db' not in g:
@@ -26,8 +28,7 @@ def init_db():
 
     with current_app.open_resource('schema.sql') as f:
         db.executescript(f.read().decode('utf8'))
-
-
+   
 @click.command('init-db')
 def init_db_command():
     """Clear the existing data and create new tables."""

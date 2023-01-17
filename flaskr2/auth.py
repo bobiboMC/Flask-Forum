@@ -5,7 +5,11 @@ from flask import (
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from flaskr.db import get_db
+
+import secrets
+import string
+from oauth2 import send_email_1_1
+
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -14,6 +18,7 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        email = request.form['email']
         db = get_db()
         error = None
 
@@ -21,12 +26,19 @@ def register():
             error = 'Username is required.'
         elif not password:
             error = 'Password is required.'
-
+        elif not email:
+            error = 'email is required.'
+        
+        m_gmail = email.endswith('@gmail.com')
+        m_outlook = email.endswith('@outlook.com')
+        if not(m_gmail or m_outlook):
+            error = 'format email is wrong.'
+        
         if error is None:
             try:
                 db.execute(
-                    "INSERT INTO user (username, password) VALUES (?, ?)",
-                    (username, generate_password_hash(password)),
+                    "INSERT INTO user (username, password, email) VALUES (?, ?, ?)",
+                    (username, generate_password_hash(password),email),
                 )
                 db.commit()
             except db.IntegrityError:
@@ -74,10 +86,6 @@ def load_logged_in_user():
         g.user = get_db().execute(
             'SELECT * FROM user WHERE id = ?', (user_id,)
         ).fetchone()
-        g.liked_post=get_db().execute(
-         'SELECT liked_posts FROM user u WHERE id = ?',(user_id,)
-        ).fetchone()
-
 
 @bp.route('/logout')
 def logout():
@@ -94,3 +102,72 @@ def login_required(view):
         return view(**kwargs)
 
     return wrapped_view
+    
+    
+    
+@bp.route('/forget_password', methods=('POST','GET'))
+def forget_pwd_outlook():
+    if request.method == 'POST':
+        if request.form.get('reset_email'):
+                #print(request.form.get('reset_email'))
+                reset_pwd=OTP()
+                session['reset'] = reset_pwd
+                session['email'] = request.form.get('reset_email')
+                ##TEST
+                print(emails_company())
+                ##TEST
+                email_sender=emails_company()['email']
+                send_email_1_1.send_exp_outlook_email(reset_pwd,email_sender,
+                                                        session['email'])
+                #send_email_1.send_exp_gmail_email(reset_pwd)
+                #send_email_2.send_email_gmail()
+                return render_template('auth/send_reset_pwd.html',enter_email=True)   
+        reset_password=session.get('reset')
+        entered_password = request.form['password_reset']
+        print(entered_password,reset_password)
+        if reset_password==entered_password:
+            print('kawai magic')
+            email=session['email']
+            return redirect(url_for('auth.create_new_pwd',email=email))
+        else:
+            flash('kawai magic')
+    #enter_email=request.form.get('enter_email')
+    #print(enter_email)
+
+    return render_template('auth/send_reset_pwd.html',enter_email=False)    
+    
+
+def OTP():
+    secretsGenerator = secrets.SystemRandom()
+    digits = string.digits #0123456789
+    reset_pwd=''
+    for i in range(0,6):
+        secure_choice = secretsGenerator.choice(digits)
+        reset_pwd+=secure_choice
+    print(reset_pwd)
+    return reset_pwd
+
+def upadte_password(email,password):
+       db = get_db() 
+       db.execute(
+             'UPDATE user SET password=?'
+             ' WHERE email = ?',
+             (generate_password_hash(password),email)
+             )
+       db.commit() 
+
+@bp.route('/create_new_password', methods=('POST','GET'))
+def create_new_pwd():
+       if request.method == 'POST':
+            email=session['email']
+            password=request.form['new_pwd']
+            comfirm_password=request.form['confirm_new_pwd']
+            if password!=comfirm_password: #different password from confirm
+                flash('confirm is wrong')
+                return render_template('auth/create_new_pwd.html') 
+            upadte_password(email,password)
+            session.clear()
+            return redirect(url_for('auth.login'))    
+            
+       return render_template('auth/create_new_pwd.html')    
+

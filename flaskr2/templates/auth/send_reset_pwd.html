@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Reset password{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    {% if not(enter_email) %}
+	<label for="email_send">Please enter your email for reset:</label>
+	<input name="reset_email" id="reset_email" required>
+	{% elif enter_email %}
+		<label for="show_reset_msg">reset code was send to your email,please enter what you get:</label>
+		<input type="password" name="password_reset" id="password_reset" minlength="6" maxlength="6" required>
+		<input type="submit" value="reset">
+	{% endif %}
+  </form>
+{% endblock %}
