@@ -5,19 +5,20 @@ Forum created in flask
 
 1. Register users
 2. Login users
-3. Create new posts
-4. Edit posts
-5. Show outside post info
-6. Show inside post info
-7. Do real-time 'like' or 'dislike' to post 
-8. Do real-time comment to post 
-9. Edit comment
-10. Navigation pages
-11. Option to choose how many posts per page
-12. Marking tag when hover on that tag
-13. Filter posts by name
-14. Filter posts by tag
-15. RSS feed for new posts
+3. reset password (currently only with outlook)
+4. Create new posts
+5. Edit posts
+6. Show outside post info
+7. Show inside post info
+8. Do real-time 'like' or 'dislike' to post 
+9. Do real-time comment to post 
+10. Edit comment
+11. Navigation pages
+12. Option to choose how many posts per page
+13. Marking tag when hover on that tag
+14. Filter posts by name
+15. Filter posts by tag
+16. RSS feed for new posts
 
 ## Pre-requestment
 ### Virtual enviroment
