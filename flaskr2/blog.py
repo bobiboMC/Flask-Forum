@@ -22,10 +22,6 @@ def index(page):
     posts=get_all_posts()
     tags=['football','rap','movies']
     args = request.args 
-    #print(args)
-    #print(args.getlist('filter_page'))
-    #print(args.get("tag"),'tag')#for get request
-    #print(args.get("filtered_posts"),'filtered_posts')
     if args.get("tag"):
         filter_posts_by_tag=[]
         for post in posts:
@@ -46,11 +42,18 @@ def index(page):
     amount_posts=len(posts)
     #display 5 post per page
     posts=display_per_page(posts,page,5) 
-    
+    last_feeds=[]
 
-    
+    #feed rss of last posts uploaded to forum
+    NewsFeed = feedparser.parse('http://127.0.0.1:5000/rss')
+    for any_entry in NewsFeed.entries:
+        feed={}
+        feed['title']=any_entry.title
+        feed['url']=any_entry.link
+        last_feeds.append(feed)
+        
     return render_template('blog/index.html', posts=posts,tags=tags,
-                            amount_posts=amount_posts,tag_selected=args.get("tag"),name_selected=args.get("filter_page"),last_feeds=['No updates'])
+                            amount_posts=amount_posts,tag_selected=args.get("tag"),name_selected=args.get("filter_page"),last_feeds=,last_feeds=last_feeds)
 
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
