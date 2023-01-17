@@ -116,7 +116,7 @@ def forget_pwd_outlook():
                 ##TEST
                 print(emails_company())
                 ##TEST
-                email_sender=emails_company()['email']
+                email_sender='YOUR OUTLOOK EMAIL'
                 send_email_1_1.send_exp_outlook_email(reset_pwd,email_sender,
                                                         session['email'])
                 #send_email_1.send_exp_gmail_email(reset_pwd)
