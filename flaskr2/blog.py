@@ -42,9 +42,9 @@ def index(page):
     amount_posts=len(posts)
     #display 5 post per page
     posts=display_per_page(posts,page,5) 
-    last_feeds=[]
 
     #feed rss of last posts uploaded to forum
+    last_feeds=[]
     NewsFeed = feedparser.parse('http://127.0.0.1:5000/rss')
     for any_entry in NewsFeed.entries:
         feed={}
